@@ -14,6 +14,8 @@ function App() {
     if (currentIndex < sentences.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setCurrentSentence(sentences[currentIndex + 1]); // Update current sentence
+      setTranslation('')
+      setResult({})
     }
   };
   useEffect(() => {
@@ -37,12 +39,12 @@ function App() {
       const prompt = `This is a translation practice from Chinese to English, revise it to get a higher band in IELTS writing.
       The Chinese sentence is: "${currentSentence}"
       and the translation is: "${translation}"
-      Revise it with tailwind style, 
+      Revise the sentence in three ways with tailwind style, 
       use "line-through" class to mark the deleted words, 
       use "text-green-500" class to mark the added words; 
       For example: This is a <span class="line-through">good</span> <span class="text-green-500">exceptional</span>work.
-      mark both the origin translation and the revised one with IELTS standard.
-      return in JSON format, {"mark": 6.5, "mark_1": 8, "revised_sentence": ""}
+      mark both the origin translation(fill to the mark in return json) and the revised ones with IELTS standard(fill to mark_1 of the return json).
+      return in JSON format, {"mark": 1-9, "mark_1": 1-9, "mark_2", "mark_3", "revised_sentence": "", "revised_sentence_2": "", "revised_sentence_3": ""}
       `;
       const response = await axios.post('https://openai.xiaopei0206.workers.dev', {
         prompt // Send the sentence as the prompt
@@ -89,7 +91,7 @@ function App() {
         </ul>
       </div>
       <div className="w-2/3 p-4">
-        <h2 className="text-lg mb-2">Current Sentence:</h2>
+        <h2 className="text-lg mb-2">Translate sentence into English:</h2>
         <p className="border p-2 mb-4">{currentSentence}</p>
         <textarea
           className="border p-2 w-full h-24 mb-4"
@@ -121,6 +123,17 @@ function App() {
                 <td className="border border-gray-300 p-2" dangerouslySetInnerHTML={{ __html: result.revised_sentence }} />
                 <td className={`border border-gray-300 p-2 ${result.mark_1 >= 7 ? 'bg-green-200' : result.mark_1 >= 5 ? 'bg-yellow-200' : 'bg-red-200'}`}>{result.mark_1}</td>
               </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">Revised 2</td>
+                <td className="border border-gray-300 p-2" dangerouslySetInnerHTML={{ __html: result.revised_sentence_2 }} />
+                <td className={`border border-gray-300 p-2 ${result.mark_1 >= 7 ? 'bg-green-200' : result.mark_1 >= 5 ? 'bg-yellow-200' : 'bg-red-200'}`}>{result.mark_2}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">Revised 3</td>
+                <td className="border border-gray-300 p-2" dangerouslySetInnerHTML={{ __html: result.revised_sentence_3 }} />
+                <td className={`border border-gray-300 p-2 ${result.mark_1 >= 7 ? 'bg-green-200' : result.mark_1 >= 5 ? 'bg-yellow-200' : 'bg-red-200'}`}>{result.mark_3}</td>
+              </tr>
+              
             </tbody>
           </table>        
           <button onClick={handleNextSentence} className="bg-green-500 text-white mt-6 p-2" disabled={currentIndex >= sentences.length - 1}>
